@@ -1,5 +1,6 @@
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
+import { BRAND } from "@/config/brand";
 
 const bricolageFont = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -8,8 +9,13 @@ const bricolageFont = Bricolage_Grotesque({
 });
 
 export const metadata = {
-  title: "Cohenix",
-  description: "Cohenix – SVG logo previewer for customizing and downloading logos with ease.",
+  title: BRAND.name,
+  description: BRAND.description,
+  openGraph: {
+    title: BRAND.name,
+    description: BRAND.description,
+    url: BRAND.url,
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import "@/styles/inputColors.css";
 import "@/styles/mask.css";
 
@@ -20,6 +20,12 @@ import { AppProvider, useAppContext } from "@/context/AppContext";
 
 import { SvgList } from "@/utils/SvgList";
 import { CircleAlert, FileWarning } from "lucide-react";
+
+const EXPORT_PRESETS = {
+  standard: { label: "Standard", svgSize: 80, pixelRatio: 2 },
+  high: { label: "High quality", svgSize: 120, pixelRatio: 3 },
+  ultra: { label: "Ultra", svgSize: 160, pixelRatio: 4 },
+};
 
 // Componente principal que usa el contexto
 function AppContent() {
@@ -54,14 +60,15 @@ function AppContent() {
   } = state;
 
   const sidebarRef = useRef(null);
+  const [exportPresetKey, setExportPresetKey] = useState("high");
+  const currentPreset = EXPORT_PRESETS[exportPresetKey] || EXPORT_PRESETS.high;
 
   const svgOptions = useRef({
     color,
     rotation,
     thickness,
-    // Larger logical size so PNG exports are very high resolution
-    width: 100,
-    height: 100,
+    width: currentPreset.svgSize,
+    height: currentPreset.svgSize,
   });
 
   useEffect(() => {
@@ -69,10 +76,10 @@ function AppContent() {
       color,
       rotation,
       thickness,
-      width: 100,
-      height: 100,
+      width: currentPreset.svgSize,
+      height: currentPreset.svgSize,
     };
-  }, [color, rotation, thickness]);
+  }, [color, rotation, thickness, currentPreset.svgSize]);
 
   const downloadSvg = useDownloadSvg(selectedSvg, svgOptions.current);
   const downloadPng = useDownloadPng(selectedSvg, svgOptions.current, name);
@@ -106,7 +113,6 @@ function AppContent() {
           toggleSidebar={toggleSidebar}
         />
       </div>
-
       <div className="relative flex h-full">
         {showSidebar && (
           <div
@@ -158,6 +164,14 @@ function AppContent() {
                 onLogoChange={handleLogoChange}
                 onLogoError={handleLogoError}
                 onLogoWarning={handleLogoWarning}
+                exportPresetKey={exportPresetKey}
+                onExportPresetChange={setExportPresetKey}
+                exportPresetOptions={Object.entries(EXPORT_PRESETS).map(
+                  ([key, preset]) => ({
+                    key,
+                    label: preset.label,
+                  }),
+                )}
               >
                 <SvgGalleryButton onClick={toggleSvgGallery} />
               </Sidebar>
@@ -192,7 +206,7 @@ function AppContent() {
           </div>
         )}
 
-        <aside className="relative hidden w-64 flex-shrink-0 md:block">
+        <aside className="relative hidden h-full w-64 flex-shrink-0 overflow-y-auto md:block">
           <Sidebar
             name={name}
             handleNameChange={handleNameChange}
@@ -205,6 +219,14 @@ function AppContent() {
             onLogoChange={handleLogoChange}
             onLogoError={handleLogoError}
             onLogoWarning={handleLogoWarning}
+            exportPresetKey={exportPresetKey}
+            onExportPresetChange={setExportPresetKey}
+            exportPresetOptions={Object.entries(EXPORT_PRESETS).map(
+              ([key, preset]) => ({
+                key,
+                label: preset.label,
+              }),
+            )}
           >
             <SvgGalleryButton onClick={toggleSvgGallery} />
           </Sidebar>
@@ -218,6 +240,7 @@ function AppContent() {
             thicknessSelection={thickness}
             selectedSvg={selectedSvg}
             userLogo={userLogo}
+            exportPixelRatio={currentPreset.pixelRatio}
           />
 
           <div className="mb-24 flex justify-center py-8 md:hidden"></div>

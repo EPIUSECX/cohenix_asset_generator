@@ -16,6 +16,7 @@ export default function MockupsCard({
   name,
   selectedSvg,
   userLogo,
+  exportPixelRatio = 4,
 }) {
   const cardRefs = useRef([]);
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function MockupsCard({
       const dataUrl = await toPng(element, {
         cacheBust: true,
         quality: 1,
-        pixelRatio: 4,
+        pixelRatio: exportPixelRatio,
         skipAutoScale: true,
         style: {
           borderRadius: "0.75rem",
@@ -106,7 +107,7 @@ export default function MockupsCard({
         const dataUrl = await toPng(element, {
           cacheBust: true,
           quality: 1,
-          pixelRatio: 4,
+          pixelRatio: exportPixelRatio,
           skipAutoScale: true,
           style: {
             borderRadius: "0.75rem",
@@ -168,6 +169,12 @@ export default function MockupsCard({
   return (
     <>
       <div className="relative m-auto grid w-full max-w-5xl min-w-full grid-cols-1 gap-4 py-6 lg:min-w-[900px] lg:grid-cols-2">
+        {!selectedSvg && !userLogo && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-xl border border-dashed border-white/20 bg-black/40 text-sm text-neutral-300 dark:border-black/20 dark:bg-white/70 dark:text-black">
+            Choose a logo from the gallery or upload your own to see live
+            mockups.
+          </div>
+        )}
         {[...Array(6)].map((_, i) => (
           <div key={i} className="group relative">
             <div

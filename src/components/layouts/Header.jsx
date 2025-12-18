@@ -13,6 +13,7 @@ import {
 import Button from "@/components/buttons/Button";
 import Switch from "@/components/form/Switch";
 import LoginButton from "@/components/auth/components/AuthButton";
+import { BRAND } from "@/config/brand";
 
 import useClickOutside from "@/hooks/useClickOutside";
 import Image from "next/image";
@@ -37,12 +38,12 @@ export default function Header({
           priority
           quality={100}
           src="/cohenix.svg"
-          alt="Cohenix logo"
+          alt={`${BRAND.name} logo`}
           width={40}
           height={40}
         />
         <h1 className="flex items-center  justify-center text-lg font-medium">
-          Cohenix
+          {BRAND.name}
           <div className="mb-2 ml-1 inline-flex items-center justify-center rounded-full border border-white/10 px-2 py-1 text-xs font-medium text-neutral-400 transition-colors dark:border-black/10">
             v1.0
             <MoveUpRight className="h-3 w-3" />

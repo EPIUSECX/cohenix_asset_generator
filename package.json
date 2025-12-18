@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "test": "echo \"No tests configured\""
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.0.14",
