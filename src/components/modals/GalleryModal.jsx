@@ -54,7 +54,7 @@ const SvgGalleryModal = ({
         onClick={onClose}
       />
       <div
-        className="fixed top-1/2 left-1/2 z-50 max-h-[80vh] w-11/12 max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-white/10 shadow-2xl backdrop-blur-md dark:border-black/10"
+        className="fixed top-1/2 left-1/2 z-50 max-h-[80vh] w-11/12 max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-3xl border border-white/10 bg-black/70 shadow-2xl backdrop-blur-md dark:border-black/10 dark:bg-white/90"
         role="dialog"
         aria-modal="true"
         aria-label="Logo gallery"
@@ -133,10 +133,10 @@ const SvgGalleryModal = ({
           </div>
         )}
         <div
-          className="overflow-y-auto p-4"
+          className="overflow-y-auto rounded-b-3xl p-3"
           style={{ maxHeight: "calc(80vh - 220px)" }}
         >
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
             {filteredList.map((svg, index) => (
               <div
                 key={svg.id ?? index}
@@ -149,10 +149,10 @@ const SvgGalleryModal = ({
                 }}
                 tabIndex={0}
                 aria-pressed={selectedSvg.name === svg.name}
-                className={`relative flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-3xl border border-white/5 p-2 transition-all duration-300 hover:scale-105 dark:border-white ${
+                className={`relative flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/5 p-1 transition-all duration-300 hover:scale-105 dark:border-white ${
                   selectedSvg.name === svg.name
                     ? "bg-white/5 dark:bg-black/5"
-                    : "border-white/10 bg-white/5 hover:border-white/30 dark:hover:border-black/30"
+                    : "border-white/10 hover:border-white/30 dark:hover:border-black/30"
                 }`}
               >
                 <div className="relative flex h-full w-full items-center justify-center">
