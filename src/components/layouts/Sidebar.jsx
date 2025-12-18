@@ -71,14 +71,14 @@ function Sidebar({
                 <Layers className="h-3 w-3" />
                 Mode
               </span>
-              <div className="flex gap-2">
+              <div className="flex gap-2 rounded-full border border-dashed border-white/10 bg-black/5 p-1 dark:border-black/20 dark:bg-white/5">
                 <button
                   type="button"
                   onClick={() => onModeChange("logos")}
                   className={`flex-1 rounded-full px-3 py-2 text-xs font-medium transition-colors ${
                     mode === "logos"
-                      ? "bg-white text-black"
-                      : "bg-black/20 text-white hover:bg-black/40 dark:bg-white/20 dark:text-black dark:hover:bg-white/40"
+                      ? "bg-white text-black shadow-sm ring-1 ring-black/10 dark:ring-white/20"
+                      : "bg-transparent text-white hover:bg-black/20 dark:text-black dark:hover:bg-white/20"
                   }`}
                 >
                   Logos
@@ -88,8 +88,8 @@ function Sidebar({
                   onClick={() => onModeChange("email")}
                   className={`flex-1 rounded-full px-3 py-2 text-xs font-medium transition-colors ${
                     mode === "email"
-                      ? "bg-white text-black"
-                      : "bg-black/20 text-white hover:bg-black/40 dark:bg-white/20 dark:text-black dark:hover:bg-white/40"
+                      ? "bg-white text-black shadow-sm ring-1 ring-black/10 dark:ring-white/20"
+                      : "bg-transparent text-white hover:bg-black/20 dark:text-black dark:hover:bg-white/20"
                   }`}
                 >
                   Email signature

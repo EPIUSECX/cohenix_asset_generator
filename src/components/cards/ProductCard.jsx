@@ -276,11 +276,14 @@ export default function MockupsCard({
                       bounce: 0.4,
                     }}
                     className="text-2xl font-bold"
-                    style={{ fontFamily: logoFontFamily, color: colorSelection }}
+                    style={{ fontFamily: logoFontFamily }}
                   >
                     {name.split("").map((letter, index) => (
                       <motion.span
-                        className="transition-colors"
+                        className="bg-gradient-to-b bg-clip-text text-transparent"
+                        style={{
+                          backgroundImage: `linear-gradient(to bottom, #ffffff, ${colorSelection})`,
+                        }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         key={index}
