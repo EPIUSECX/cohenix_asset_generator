@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState, useMemo } from "react";
 import "@/styles/inputColors.css";
 import "@/styles/mask.css";
 
@@ -19,6 +19,10 @@ import useDownloadPng from "@/hooks/download-svg-png/useDownloadPng";
 import { AppProvider, useAppContext } from "@/context/AppContext";
 
 import { SvgList } from "@/utils/SvgList";
+import { BRAND } from "@/config/brand";
+import { EMAIL_TEMPLATES, buildSignatureHtml } from "@/utils/emailTemplates";
+import { EmailSignaturePreview } from "@/components/signature/EmailSignaturePreview";
+import { toPng } from "html-to-image";
 import { CircleAlert, FileWarning } from "lucide-react";
 
 const EXPORT_PRESETS = {
@@ -60,8 +64,35 @@ function AppContent() {
   } = state;
 
   const sidebarRef = useRef(null);
+  const [mode, setMode] = useState("logos"); // 'logos' | 'email'
+  const signatureRef = useRef(null);
+
+  const [signatureState, setSignatureState] = useState({
+    fullName: "Founder Cohenix",
+    title: "An EPI-USE Service Line",
+    mobile: "0735997905",
+    email: "marketing@cohenix.com",
+    timezone: "UTC+02:00 Africa/Johannesburg",
+    website: BRAND.url,
+    disclaimerUrl: `${BRAND.url}/disclaimer`,
+    groupUrl: "https://www.groupelephant.com",
+    erpUrl: "https://erp.ngo",
+    templateId: EMAIL_TEMPLATES[0]?.id ?? "cohenix-default",
+  });
   const [exportPresetKey, setExportPresetKey] = useState("high");
   const currentPreset = EXPORT_PRESETS[exportPresetKey] || EXPORT_PRESETS.high;
+  const currentTemplate =
+    EMAIL_TEMPLATES.find((t) => t.id === signatureState.templateId) ||
+    EMAIL_TEMPLATES[0];
+
+  const signatureData = {
+    ...signatureState,
+    bannerPath: currentTemplate?.bannerPath,
+    bannerUrl: `${typeof window !== "undefined" ? window.location.origin : ""}${
+      currentTemplate?.bannerPath || ""
+    }`,
+    primaryColor: BRAND.primaryColor,
+  };
 
   const svgOptions = useRef({
     color,
@@ -83,6 +114,100 @@ function AppContent() {
 
   const downloadSvg = useDownloadSvg(selectedSvg, svgOptions.current);
   const downloadPng = useDownloadPng(selectedSvg, svgOptions.current, name);
+
+  const handleCopySignatureHtml = useCallback(async () => {
+    try {
+      const html = buildSignatureHtml(signatureData);
+      if (navigator.clipboard && window.ClipboardItem) {
+        const blobHtml = new Blob([html], { type: "text/html" });
+        const blobText = new Blob([html], { type: "text/plain" });
+        const item = new ClipboardItem({
+          "text/html": blobHtml,
+          "text/plain": blobText,
+        });
+        await navigator.clipboard.write([item]);
+      } else {
+        await navigator.clipboard.writeText(html);
+      }
+      alert("Signature HTML (rich) copied to clipboard. Paste it into Outlook's signature editor.");
+    } catch (e) {
+      console.error("Failed to copy signature HTML", e);
+      alert("Unable to copy HTML. Please try again.");
+    }
+  }, [signatureData]);
+
+  const handleDownloadSignaturePng = useCallback(async () => {
+    if (!signatureRef.current) return;
+    try {
+      const node = signatureRef.current;
+      const rect = node.getBoundingClientRect();
+      const width = rect.width;
+      const height = node.scrollHeight || rect.height;
+
+      const dataUrl = await toPng(node, {
+        cacheBust: true,
+        quality: 1,
+        pixelRatio: currentPreset.pixelRatio,
+        width,
+        height,
+        style: {
+          width: `${width}px`,
+          height: `${height}px`,
+          backgroundColor: "#ffffff",
+        },
+      });
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = `${signatureState.fullName || "signature"}.png`;
+      link.click();
+    } catch (e) {
+      console.error("Error downloading signature PNG", e);
+      alert("Unable to download signature image.");
+    }
+  }, [currentPreset.pixelRatio, signatureState.fullName]);
+
+  const primaryDownload = mode === "email" ? handleCopySignatureHtml : downloadSvg;
+  const secondaryDownload = mode === "email" ? handleDownloadSignaturePng : downloadPng;
+  const showMockupsDownload = mode === "logos";
+
+  const logoGalleryItems = SvgList;
+  const bannerGalleryItems = useMemo(
+    () =>
+      EMAIL_TEMPLATES.map((t, index) => ({
+        id: t.id,
+        name: t.name,
+        Svg: ({ width = 80, height = 80 }) => (
+          // Banner preview clipped to rounded square, so it fits the gallery card
+          <div className="flex h-full w-full items-center justify-center">
+            <img
+              src={t.bannerPath}
+              alt={t.name}
+              style={{ width: "80%", height: "80%", objectFit: "cover", borderRadius: "0.75rem" }}
+            />
+          </div>
+        ),
+      })),
+    [],
+  );
+
+  const galleryItems = mode === "logos" ? logoGalleryItems : bannerGalleryItems;
+
+  const handleGallerySelect = (item) => {
+    if (mode === "logos") {
+      handleSvgSelect(item);
+    } else {
+      setSignatureState((prev) => ({
+        ...prev,
+        templateId: item.id || prev.templateId,
+      }));
+    }
+  };
+
+  const selectedGalleryItem =
+    mode === "logos"
+      ? selectedSvg
+      : bannerGalleryItems.find((b) => b.id === signatureState.templateId) ||
+        bannerGalleryItems[0];
 
   const downloadAllMockups = useCallback(() => {
     if (
@@ -106,9 +231,10 @@ function AppContent() {
     <div className="flex h-screen flex-col">
       <div className="relative">
         <Header
-          handleDownloadSvg={downloadSvg}
-          handleDownloadPng={downloadPng}
-          downloadAllMockups={downloadAllMockups}
+          handleDownloadSvg={primaryDownload}
+          handleDownloadPng={secondaryDownload}
+          downloadAllMockups={showMockupsDownload ? downloadAllMockups : () => {}}
+              mode={mode}
           onLoginClick={toggleLoginModal}
           toggleSidebar={toggleSidebar}
         />
@@ -164,6 +290,12 @@ function AppContent() {
                 onLogoChange={handleLogoChange}
                 onLogoError={handleLogoError}
                 onLogoWarning={handleLogoWarning}
+                mode={mode}
+                onModeChange={setMode}
+                signatureState={signatureState}
+                onSignatureChange={(field, value) =>
+                  setSignatureState((prev) => ({ ...prev, [field]: value }))
+                }
                 exportPresetKey={exportPresetKey}
                 onExportPresetChange={setExportPresetKey}
                 exportPresetOptions={Object.entries(EXPORT_PRESETS).map(
@@ -173,7 +305,7 @@ function AppContent() {
                   }),
                 )}
               >
-                <SvgGalleryButton onClick={toggleSvgGallery} />
+                <SvgGalleryButton mode={mode} onClick={toggleSvgGallery} />
               </Sidebar>
             </div>
           </div>
@@ -219,6 +351,12 @@ function AppContent() {
             onLogoChange={handleLogoChange}
             onLogoError={handleLogoError}
             onLogoWarning={handleLogoWarning}
+            mode={mode}
+            onModeChange={setMode}
+            signatureState={signatureState}
+            onSignatureChange={(field, value) =>
+              setSignatureState((prev) => ({ ...prev, [field]: value }))
+            }
             exportPresetKey={exportPresetKey}
             onExportPresetChange={setExportPresetKey}
             exportPresetOptions={Object.entries(EXPORT_PRESETS).map(
@@ -228,30 +366,36 @@ function AppContent() {
               }),
             )}
           >
-            <SvgGalleryButton onClick={toggleSvgGallery} />
+            <SvgGalleryButton mode={mode} onClick={toggleSvgGallery} />
           </Sidebar>
         </aside>
 
         <div className="flex w-full flex-col overflow-y-auto border-white/10 px-2 pb-3 md:pb-20 dark:border-black/10">
-          <MockupsCard
-            name={name}
-            colorSelection={color}
-            rotationSelection={rotation}
-            thicknessSelection={thickness}
-            selectedSvg={selectedSvg}
-            userLogo={userLogo}
-            exportPixelRatio={currentPreset.pixelRatio}
-          />
-
-          <div className="mb-24 flex justify-center py-8 md:hidden"></div>
+          {mode === "logos" && (
+            <>
+              <MockupsCard
+                name={name}
+                colorSelection={color}
+                rotationSelection={rotation}
+                thicknessSelection={thickness}
+                selectedSvg={selectedSvg}
+                userLogo={userLogo}
+                exportPixelRatio={currentPreset.pixelRatio}
+              />
+              <div className="mb-24 flex justify-center py-8 md:hidden"></div>
+            </>
+          )}
+          {mode === "email" && (
+            <EmailSignaturePreview ref={signatureRef} data={signatureData} />
+          )}
         </div>
 
         <SvgGalleryModal
           show={showSvgGallery}
           onClose={toggleSvgGallery}
-          svgList={SvgList}
-          onSelect={handleSvgSelect}
-          selectedSvg={selectedSvg}
+          svgList={galleryItems}
+          onSelect={handleGallerySelect}
+          selectedSvg={selectedGalleryItem}
         />
 
         <LoginModal show={showLoginModal} onClose={toggleLoginModal} />

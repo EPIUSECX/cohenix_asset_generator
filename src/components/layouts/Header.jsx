@@ -25,6 +25,7 @@ export default function Header({
   children,
   downloadAllMockups,
   toggleSidebar,
+  mode = "logos",
 }) {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
@@ -88,7 +89,7 @@ export default function Header({
                   }}
                   className="group flex w-full cursor-pointer items-start gap-1 border-b border-dashed border-white/10 px-4 py-2 text-left text-sm dark:border-black/10"
                 >
-                  Download SVG
+                  {mode === "email" ? "Copy HTML (Outlook)" : "Download SVG"}
                   <MoveUpRight className="h-3 w-3 transition duration-200 group-hover:scale-125" />
                 </button>
                 <button
@@ -98,19 +99,21 @@ export default function Header({
                   }}
                   className="group flex w-full cursor-pointer items-start gap-1 border-b border-dashed border-white/10 px-4 py-2 text-left text-sm dark:border-black/10"
                 >
-                  Download PNG
+                  {mode === "email" ? "Download PNG" : "Download PNG"}
                   <MoveUpRight className="h-3 w-3 transition duration-200 group-hover:scale-125" />
                 </button>
-                <button
-                  onClick={() => {
-                    downloadAllMockups();
-                    setShowDropdown(false);
-                  }}
-                  className="group flex w-full cursor-pointer items-start gap-1 px-4 py-2 text-left text-sm text-nowrap text-ellipsis"
-                >
-                  Mockups
-                  <Layout className="h-3 w-3 transition duration-200 group-hover:scale-125" />
-                </button>
+                {mode === "logos" && (
+                  <button
+                    onClick={() => {
+                      downloadAllMockups();
+                      setShowDropdown(false);
+                    }}
+                    className="group flex w-full cursor-pointer items-start gap-1 px-4 py-2 text-left text-sm text-nowrap text-ellipsis"
+                  >
+                    Mockups
+                    <Layout className="h-3 w-3 transition duration-200 group-hover:scale-125" />
+                  </button>
+                )}
               </div>
             </div>
           )}

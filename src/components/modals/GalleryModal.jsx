@@ -104,7 +104,7 @@ const SvgGalleryModal = ({
         </div>
         <div
           className="overflow-y-auto p-4"
-          style={{ maxHeight: "calc(80vh - 130px)" }}
+          style={{ maxHeight: "calc(80vh - 220px)" }}
         >
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
             {filteredList.map((svg, index) => (
