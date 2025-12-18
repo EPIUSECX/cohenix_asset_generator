@@ -13,10 +13,18 @@ const SvgGalleryModal = ({
 }) => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [templateType, setTemplateType] = useState("all");
 
   const categories = useMemo(() => {
     const unique = new Set(
       svgList.map((svg) => svg.category).filter(Boolean),
+    );
+    return ["all", ...Array.from(unique)];
+  }, [svgList]);
+
+  const templateTypes = useMemo(() => {
+    const unique = new Set(
+      svgList.map((svg) => svg.templateType).filter(Boolean),
     );
     return ["all", ...Array.from(unique)];
   }, [svgList]);
@@ -26,13 +34,15 @@ const SvgGalleryModal = ({
       svgList.filter((svg) => {
         const matchesCategory =
           category === "all" || svg.category === category;
+        const matchesTemplateType =
+          templateType === "all" || svg.templateType === templateType;
         const haystack = `${svg.name} ${(svg.tags || []).join(" ")}`.toLowerCase();
         const matchesSearch = !search
           ? true
           : haystack.includes(search.toLowerCase());
-        return matchesCategory && matchesSearch;
+        return matchesCategory && matchesTemplateType && matchesSearch;
       }),
-    [svgList, search, category],
+    [svgList, search, category, templateType],
   );
 
   if (!show) return null;
@@ -102,6 +112,26 @@ const SvgGalleryModal = ({
             </button>
           ))}
         </div>
+        {templateTypes.length > 1 && (
+          <div className="flex flex-wrap gap-2 px-4 pb-2 text-xs">
+            {templateTypes.map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setTemplateType(type)}
+                className={`rounded-full border px-2 py-1 ${
+                  templateType === type
+                    ? "border-white bg-white/10 text-white dark:border-black dark:bg-black/10 dark:text-black"
+                    : "border-white/10 text-white/80 hover:border-white/40 dark:border-black/10 dark:text-black/70 dark:hover:border-black/40"
+                }`}
+              >
+                {type === "all"
+                  ? "All templates"
+                  : type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
+            ))}
+          </div>
+        )}
         <div
           className="overflow-y-auto p-4"
           style={{ maxHeight: "calc(80vh - 220px)" }}

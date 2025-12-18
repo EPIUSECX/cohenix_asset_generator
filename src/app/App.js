@@ -20,6 +20,14 @@ import { AppProvider, useAppContext } from "@/context/AppContext";
 
 import { SvgList } from "@/utils/SvgList";
 import { BRAND } from "@/config/brand";
+import {
+  LOGO_FONT_PRESETS,
+  LOGO_BACKGROUND_PRESETS,
+  getLogoFontPreset,
+  getLogoBackgroundPreset,
+} from "@/config/logoOptions";
+import { getLogoGradientPattern } from "@/config/logoGradients";
+import GradientModal from "@/components/modals/GradientModal";
 import { EMAIL_TEMPLATES, buildSignatureHtml } from "@/utils/emailTemplates";
 import { EmailSignaturePreview } from "@/components/signature/EmailSignaturePreview";
 import { toPng } from "html-to-image";
@@ -67,6 +75,20 @@ function AppContent() {
   const [mode, setMode] = useState("logos"); // 'logos' | 'email'
   const signatureRef = useRef(null);
 
+  const [logoFontPresetId, setLogoFontPresetId] = useState(
+    LOGO_FONT_PRESETS[0]?.id || "sans",
+  );
+  const [logoBackgroundPresetId, setLogoBackgroundPresetId] = useState(
+    LOGO_BACKGROUND_PRESETS[0]?.id || "brand-dark",
+  );
+
+  const [useGradientBackground, setUseGradientBackground] = useState(false);
+  const [gradientPatternId, setGradientPatternId] = useState("soft-diagonal");
+  const [gradientPrimaryColor, setGradientPrimaryColor] = useState("#0400f5");
+  const [gradientSecondaryColor, setGradientSecondaryColor] =
+    useState("#60a5fa");
+  const [showGradientModal, setShowGradientModal] = useState(false);
+
   const [signatureState, setSignatureState] = useState({
     fullName: "Founder Cohenix",
     title: "An EPI-USE Service Line",
@@ -84,6 +106,22 @@ function AppContent() {
   const currentTemplate =
     EMAIL_TEMPLATES.find((t) => t.id === signatureState.templateId) ||
     EMAIL_TEMPLATES[0];
+
+  const currentLogoFontPreset = getLogoFontPreset(logoFontPresetId);
+  const currentLogoBackgroundPreset = getLogoBackgroundPreset(
+    logoBackgroundPresetId,
+  );
+
+  const currentGradientPattern = getLogoGradientPattern(gradientPatternId);
+
+  const logoGradientStyle = useGradientBackground
+    ? {
+        backgroundImage: currentGradientPattern.build({
+          primary: gradientPrimaryColor || color,
+          secondary: gradientSecondaryColor || color,
+        }),
+      }
+    : {};
 
   const signatureData = {
     ...signatureState,
@@ -234,7 +272,7 @@ function AppContent() {
           handleDownloadSvg={primaryDownload}
           handleDownloadPng={secondaryDownload}
           downloadAllMockups={showMockupsDownload ? downloadAllMockups : () => {}}
-              mode={mode}
+          mode={mode}
           onLoginClick={toggleLoginModal}
           toggleSidebar={toggleSidebar}
         />
@@ -292,6 +330,13 @@ function AppContent() {
                 onLogoWarning={handleLogoWarning}
                 mode={mode}
                 onModeChange={setMode}
+                logoFontPresetId={logoFontPresetId}
+                onLogoFontPresetChange={setLogoFontPresetId}
+                logoBackgroundPresetId={logoBackgroundPresetId}
+                onLogoBackgroundPresetChange={setLogoBackgroundPresetId}
+                useGradientBackground={useGradientBackground}
+                onToggleGradientBackground={setUseGradientBackground}
+                onOpenGradientModal={() => setShowGradientModal(true)}
                 signatureState={signatureState}
                 onSignatureChange={(field, value) =>
                   setSignatureState((prev) => ({ ...prev, [field]: value }))
@@ -353,6 +398,13 @@ function AppContent() {
             onLogoWarning={handleLogoWarning}
             mode={mode}
             onModeChange={setMode}
+            logoFontPresetId={logoFontPresetId}
+            onLogoFontPresetChange={setLogoFontPresetId}
+            logoBackgroundPresetId={logoBackgroundPresetId}
+            onLogoBackgroundPresetChange={setLogoBackgroundPresetId}
+            useGradientBackground={useGradientBackground}
+            onToggleGradientBackground={setUseGradientBackground}
+            onOpenGradientModal={() => setShowGradientModal(true)}
             signatureState={signatureState}
             onSignatureChange={(field, value) =>
               setSignatureState((prev) => ({ ...prev, [field]: value }))
@@ -381,6 +433,10 @@ function AppContent() {
                 selectedSvg={selectedSvg}
                 userLogo={userLogo}
                 exportPixelRatio={currentPreset.pixelRatio}
+                logoFontFamily={currentLogoFontPreset.stack}
+                logoBackgroundPresetId={currentLogoBackgroundPreset.id}
+                logoGradientStyle={logoGradientStyle}
+                useGradientBackground={useGradientBackground}
               />
               <div className="mb-24 flex justify-center py-8 md:hidden"></div>
             </>
@@ -399,6 +455,20 @@ function AppContent() {
         />
 
         <LoginModal show={showLoginModal} onClose={toggleLoginModal} />
+
+        <GradientModal
+          show={showGradientModal}
+          onClose={() => setShowGradientModal(false)}
+          initialPatternId={gradientPatternId}
+          initialPrimary={gradientPrimaryColor || color}
+          initialSecondary={gradientSecondaryColor || color}
+          onSave={({ patternId, primary, secondary }) => {
+            setGradientPatternId(patternId);
+            setGradientPrimaryColor(primary);
+            setGradientSecondaryColor(secondary);
+            setUseGradientBackground(true);
+          }}
+        />
       </div>
     </div>
   );

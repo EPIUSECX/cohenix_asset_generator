@@ -17,6 +17,10 @@ export default function MockupsCard({
   selectedSvg,
   userLogo,
   exportPixelRatio = 4,
+  logoFontFamily,
+  logoBackgroundPresetId = "brand-dark",
+  logoGradientStyle = {},
+  useGradientBackground = false,
 }) {
   const cardRefs = useRef([]);
   useEffect(() => {
@@ -63,6 +67,15 @@ export default function MockupsCard({
     backgroundImage: `radial-gradient(circle at bottom right, ${colorSelection} -1000%, transparent 50%), 
                       radial-gradient(circle at top left, ${colorSelection} -1000%, transparent 60%)`,
   };
+
+  const backgroundClassMap = {
+    "brand-dark": "bg-[#0A0A0A] dark:bg-white",
+    "soft-light": "bg-white",
+    "off-white": "bg-neutral-50",
+  };
+
+  const baseBackgroundClass =
+    backgroundClassMap[logoBackgroundPresetId] || backgroundClassMap["brand-dark"];
 
   const executeDownloadCard = async (index) => {
     try {
@@ -192,7 +205,13 @@ export default function MockupsCard({
               }`}
             >
               {i === 0 && (
-                <div className="absolute flex h-full w-full items-center justify-center bg-[#0A0A0A] dark:bg-white">
+                <div
+                  className={`absolute flex h-full w-full items-center justify-center ${baseBackgroundClass}`}
+                  style={{
+                    fontFamily: logoFontFamily,
+                    ...(useGradientBackground ? logoGradientStyle : {}),
+                  }}
+                >
                   <svg
                     className="absolute -top-1 -left-32 opacity-30 blur-3xl"
                     viewBox="0 0 100 100"
@@ -237,8 +256,8 @@ export default function MockupsCard({
               {/* Rest of the card layouts remain the same */}
               {i === 1 && (
                 <div
-                  style={doubleGradientStyle}
-                  className="absolute flex min-h-full w-full items-center justify-center bg-[#0A0A0A] dark:bg-white"
+                  style={useGradientBackground ? logoGradientStyle : doubleGradientStyle}
+                  className={`absolute flex min-h-full w-full items-center justify-center ${baseBackgroundClass}`}
                 >
                   <motion.div
                     variants={selectedSvgVariants}
@@ -257,10 +276,11 @@ export default function MockupsCard({
                       bounce: 0.4,
                     }}
                     className="text-2xl font-bold"
+                    style={{ fontFamily: logoFontFamily, color: colorSelection }}
                   >
                     {name.split("").map((letter, index) => (
                       <motion.span
-                        className="text-white dark:text-black"
+                        className="transition-colors"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         key={index}
@@ -275,8 +295,19 @@ export default function MockupsCard({
               )}
 
               {i === 2 && (
-                <div className="absolute flex h-full w-full items-center justify-center rounded-xl bg-[#0A0A0A] select-none dark:bg-white">
-                  <div className="absolute h-full w-full bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px] opacity-5 [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] dark:bg-[radial-gradient(#000_1px,transparent_3px)]"></div>
+                <div
+                  className={`absolute flex h-full w-full items-center justify-center rounded-xl select-none ${baseBackgroundClass}`}
+                  style={useGradientBackground ? logoGradientStyle : {}}
+                >
+                  <div
+                    className="absolute h-full w-full [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"
+                    style={{
+                      backgroundImage: `radial-gradient(${hexToRgba(
+                        colorSelection,
+                        0.25,
+                      )} 1px, transparent 1px)`,
+                    }}
+                  ></div>
                   <div className="mt-2 flex h-30 w-30 items-center justify-center">
                     {renderSvgOrLogo(150, 150)}
                   </div>
@@ -284,22 +315,32 @@ export default function MockupsCard({
               )}
 
               {i === 3 && (
-                <div className="absolute flex h-full w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-[#0A0A0A] dark:bg-white">
-                  <div
-                    className="absolute inset-0 h-full w-full"
-                    style={{
-                      background: `radial-gradient(125% 125% at 50% 20%, #0A0A0A 40%, ${colorSelection} 200%)`,
-                      zIndex: 1,
-                    }}
-                  ></div>
+                <div
+                  className={`absolute flex h-full w-full items-center justify-center gap-2 overflow-hidden rounded-lg ${baseBackgroundClass}`}
+                  style={{
+                    fontFamily: logoFontFamily,
+                    ...(useGradientBackground ? logoGradientStyle : {}),
+                  }}
+                >
+                  {!useGradientBackground && (
+                    <>
+                      <div
+                        className="absolute inset-0 h-full w-full"
+                        style={{
+                          background: `radial-gradient(125% 125% at 50% 20%, #0A0A0A 40%, ${colorSelection} 200%)`,
+                          zIndex: 1,
+                        }}
+                      ></div>
 
-                  <div
-                    className="absolute inset-0 hidden h-full w-full dark:block"
-                    style={{
-                      background: `radial-gradient(125% 125% at 50% 20%, #ffffff 40%, ${colorSelection} 200%)`,
-                      zIndex: 1,
-                    }}
-                  ></div>
+                      <div
+                        className="absolute inset-0 hidden h-full w-full dark:block"
+                        style={{
+                          background: `radial-gradient(125% 125% at 50% 20%, #ffffff 40%, ${colorSelection} 200%)`,
+                          zIndex: 1,
+                        }}
+                      ></div>
+                    </>
+                  )}
 
                   <div className="relative z-10 flex items-center justify-center">
                     {renderSvgOrLogo(70, 70)}
@@ -316,7 +357,13 @@ export default function MockupsCard({
               )}
 
               {i === 4 && (
-                <div className="absolute flex h-full w-full items-center justify-center rounded-b bg-[#0A0A0A] dark:bg-white">
+                <div
+                  className={`absolute flex h-full w-full items-center justify-center rounded-b ${baseBackgroundClass}`}
+                  style={{
+                    fontFamily: logoFontFamily,
+                    ...(useGradientBackground ? logoGradientStyle : {}),
+                  }}
+                >
                   <div className="relative mt-2 flex h-14 w-14 items-center justify-center">
                     {renderSvgOrLogo(40, 40)}
                   </div>
@@ -326,8 +373,8 @@ export default function MockupsCard({
 
               {i === 5 && (
                 <div
-                  style={gradientStyle}
-                  className="absolute flex h-full w-full flex-col items-center justify-center bg-[#0A0A0A] dark:bg-white"
+                  style={useGradientBackground ? logoGradientStyle : gradientStyle}
+                  className={`absolute flex h-full w-full flex-col items-center justify-center ${baseBackgroundClass}`}
                 >
                   <div className="mt-2 flex items-center justify-center gap-8">
                     {renderSvgOrLogo(30, 30)}

@@ -29,6 +29,13 @@ function Sidebar({
   exportPresetKey,
   onExportPresetChange,
   exportPresetOptions = [],
+  logoFontPresetId,
+  onLogoFontPresetChange,
+  logoBackgroundPresetId,
+  onLogoBackgroundPresetChange,
+  useGradientBackground,
+  onToggleGradientBackground,
+  onOpenGradientModal,
 }) {
   const [userLogo, setUserLogo] = useState(null);
 
@@ -114,6 +121,98 @@ function Sidebar({
                 inputValue={thickness}
                 handleThicknessChange={handleThicknessChange}
               />
+
+              {onLogoFontPresetChange && (
+                <div className="flex flex-col border-t border-white/5 p-4 dark:border-black/10">
+                  <span className="mb-2 flex items-center gap-2 text-sm font-light">
+                    <MoveUpRight className="h-3 w-3" />
+                    Font preset
+                  </span>
+                  <div className="mx-auto w-full max-w-md">
+                    <div className="relative flex h-12 items-center gap-3 rounded-full border border-dashed border-white/10 bg-black/5 pr-6 pl-4 dark:border-black/20 dark:bg-white/5">
+                      <div className="relative flex h-6 w-full items-center justify-between text-xs font-semibold whitespace-nowrap text-white dark:text-black">
+                        <span>{logoFontPresetId}</span>
+                        <ChevronDown className="h-3 w-3 opacity-70" />
+                      </div>
+                      <select
+                        value={logoFontPresetId}
+                        onChange={(e) => onLogoFontPresetChange(e.target.value)}
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      >
+                        <option value="sans">Cohenix Sans</option>
+                        <option value="rounded">Cohenix Rounded</option>
+                        <option value="mono">Cohenix Mono</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {onLogoBackgroundPresetChange && (
+                <div className="flex flex-col border-t border-white/5 p-4 dark:border-black/10">
+                  <span className="mb-2 flex items-center gap-2 text-sm font-light">
+                    <Sparkles className="h-3 w-3" />
+                    Background style
+                  </span>
+                  <div className="mx-auto flex w-full max-w-md flex-col gap-3">
+                    <div className="flex gap-2 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => onToggleGradientBackground?.(false)}
+                        className={`flex-1 rounded-full px-3 py-2 font-medium ${
+                          !useGradientBackground
+                            ? "bg-white text-black"
+                            : "bg-black/20 text-white hover:bg-black/40 dark:bg-white/20 dark:text-black dark:hover:bg-white/40"
+                        }`}
+                      >
+                        Solid
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onToggleGradientBackground?.(true)}
+                        className={`flex-1 rounded-full px-3 py-2 font-medium ${
+                          useGradientBackground
+                            ? "bg-white text-black"
+                            : "bg-black/20 text-white hover:bg-black/40 dark:bg:white/20 dark:text-black dark:hover:bg-white/40"
+                        }`}
+                      >
+                        Gradient
+                      </button>
+                    </div>
+
+                    {!useGradientBackground && (
+                      <div className="relative flex h-12 items-center gap-3 rounded-full border border-dashed border-white/10 bg-black/5 pr-6 pl-4 dark:border-black/20 dark:bg-white/5">
+                        <div className="relative flex h-6 w-full items-center justify-between text-xs font-semibold whitespace-nowrap text-white dark:text-black">
+                          <span>{logoBackgroundPresetId}</span>
+                          <ChevronDown className="h-3 w-3 opacity-70" />
+                        </div>
+                        <select
+                          value={logoBackgroundPresetId}
+                          onChange={(e) =>
+                            onLogoBackgroundPresetChange(e.target.value)
+                          }
+                          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                        >
+                          <option value="brand-dark">Brand dark</option>
+                          <option value="soft-light">Soft light</option>
+                          <option value="off-white">Off‑white</option>
+                        </select>
+                      </div>
+                    )}
+
+                    {useGradientBackground && (
+                      <button
+                        type="button"
+                        onClick={onOpenGradientModal}
+                        className="flex items-center justify-between rounded-full border border-dashed border-white/10 bg-black/5 px-4 py-2 text-xs font-semibold text-white hover:border-white/40 hover:bg-black/20 dark:border-black/20 dark:bg-white/5 dark:text-black dark:hover:border-black/40 dark:hover:bg-white/20"
+                      >
+                        <span>Edit gradient</span>
+                        <MoveUpRight className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
             </>
           )}
 
