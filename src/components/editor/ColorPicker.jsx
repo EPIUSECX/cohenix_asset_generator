@@ -26,7 +26,7 @@ export default function ColorsControl({ color, handleColorChange }) {
           value={color}
           onChange={handleColorChange}
           style={{ background: color }}
-          className="color-picker"
+          className="color-picker h-7 w-7 cursor-pointer rounded-full border border-white/40 shadow-sm dark:border-black/30"
         />
         <motion.span
           key={color}
