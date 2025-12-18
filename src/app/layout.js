@@ -8,8 +8,8 @@ const bricolageFont = Bricolage_Grotesque({
 });
 
 export const metadata = {
-  title: "arosade",
-  description: "",
+  title: "Cohenix",
+  description: "Cohenix – SVG logo previewer for customizing and downloading logos with ease.",
 };
 
 export default function RootLayout({ children }) {

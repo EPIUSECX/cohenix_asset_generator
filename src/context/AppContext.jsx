@@ -6,7 +6,7 @@ const initialState = {
   thickness: 0,
   rotation: 0,
   color: "#787878",
-  name: "Arosade",
+  name: "Cohenix",
   showModal: false,
   selectedSvg: null,
   showSidebar: false,

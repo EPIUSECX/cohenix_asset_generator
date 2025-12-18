@@ -36,13 +36,13 @@ export default function Header({
         <Image
           priority
           quality={100}
-          src="/favicon.svg"
-          alt="logo"
+          src="/cohenix.svg"
+          alt="Cohenix logo"
           width={40}
           height={40}
         />
         <h1 className="flex items-center  justify-center text-lg font-medium">
-          Arosade
+          Cohenix
           <div className="mb-2 ml-1 inline-flex items-center justify-center rounded-full border border-white/10 px-2 py-1 text-xs font-medium text-neutral-400 transition-colors dark:border-black/10">
             v1.0
             <MoveUpRight className="h-3 w-3" />
@@ -59,7 +59,7 @@ export default function Header({
             <Star className="h-4 w-4 transition-all group-hover:animate-spin" />
           }
           label="Stars on Github"
-          src="https://github.com/JhojanGgarcia/arosade"
+          src="https://github.com/EPIUSECX/cohenix_asset_generator"
         />
 
         <Button

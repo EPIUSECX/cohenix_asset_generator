@@ -7,7 +7,6 @@ import { toPng } from "html-to-image";
 import { saveAs } from "file-saver";
 import { Download, AlertCircle } from "lucide-react";
 import "@/styles/mask.css";
-import ContributionModal from "@/components/modals/ContributionModal";
 import Image from "next/image";
 
 export default function MockupsCard({
@@ -19,26 +18,8 @@ export default function MockupsCard({
   userLogo,
 }) {
   const cardRefs = useRef([]);
-  const [showContributionModal, setShowContributionModal] = useState(false);
-  const [pendingDownloadIndex, setPendingDownloadIndex] = useState(null);
-  const [pendingAction, setPendingAction] = useState(null);
-  const [hasContributed, setHasContributed] = useState(false);
-  const [remainingDownloads, setRemainingDownloads] = useState(2);
-  const [showLimitToast, setShowLimitToast] = useState(false);
-
   useEffect(() => {
     cardRefs.current = cardRefs.current.slice(0, 6);
-
-    const userContributed = localStorage.getItem("arosContributed");
-    if (userContributed === "true") {
-      setHasContributed(true);
-    }
-    const downloads = localStorage.getItem("arosRemainingDownloads");
-    if (downloads !== null) {
-      setRemainingDownloads(parseInt(downloads));
-    } else {
-      localStorage.setItem("arosRemainingDownloads", "2");
-    }
   }, []);
 
   const selectedSvgVariants = {
@@ -82,41 +63,6 @@ export default function MockupsCard({
                       radial-gradient(circle at top left, ${colorSelection} -1000%, transparent 60%)`,
   };
 
-  const updateRemainingDownloads = () => {
-    const newCount = remainingDownloads - 1;
-    localStorage.setItem("arosRemainingDownloads", newCount.toString());
-    setRemainingDownloads(newCount);
-  };
-
-  const handleContributionSuccess = () => {
-    setHasContributed(true);
-    localStorage.setItem("arosContributed", "true");
-    setShowContributionModal(false);
-
-    if (pendingAction === "downloadCard" && pendingDownloadIndex !== null) {
-      executeDownloadCard(pendingDownloadIndex);
-    } else if (pendingAction === "downloadAllCards") {
-      executeDownloadAllCards();
-    }
-
-    setPendingAction(null);
-    setPendingDownloadIndex(null);
-  };
-
-  const handleContinueWithoutPaying = () => {
-    if (pendingAction === "downloadCard" && pendingDownloadIndex !== null) {
-      executeDownloadCard(pendingDownloadIndex);
-      updateRemainingDownloads();
-    } else if (pendingAction === "downloadAllCards") {
-      executeDownloadAllCards();
-      updateRemainingDownloads();
-    }
-
-    // Clear pending state
-    setPendingAction(null);
-    setPendingDownloadIndex(null);
-  };
-
   const executeDownloadCard = async (index) => {
     try {
       const element = cardRefs.current[index];
@@ -127,8 +73,8 @@ export default function MockupsCard({
 
       const dataUrl = await toPng(element, {
         cacheBust: true,
-        quality: 0.95,
-        pixelRatio: 2,
+        quality: 1,
+        pixelRatio: 4,
         skipAutoScale: true,
         style: {
           borderRadius: "0.75rem",
@@ -146,21 +92,8 @@ export default function MockupsCard({
   };
 
   const downloadCardAsImage = (index) => {
-    if (hasContributed) {
-      executeDownloadCard(index);
-    } else if (remainingDownloads > 0) {
-      setPendingDownloadIndex(index);
-      setPendingAction("downloadCard");
-      setShowContributionModal(true);
-    } else {
-      setPendingDownloadIndex(index);
-      setPendingAction("downloadCard");
-      setShowContributionModal(true);
-
-      // Show toast notification
-      setShowLimitToast(true);
-      setTimeout(() => setShowLimitToast(false), 5000);
-    }
+    // No limits or paywall: always allow direct download
+    executeDownloadCard(index);
   };
 
   const executeDownloadAllCards = useCallback(async () => {
@@ -172,8 +105,8 @@ export default function MockupsCard({
 
         const dataUrl = await toPng(element, {
           cacheBust: true,
-          quality: 0.95,
-          pixelRatio: 2,
+          quality: 1,
+          pixelRatio: 4,
           skipAutoScale: true,
           style: {
             borderRadius: "0.75rem",
@@ -199,21 +132,10 @@ export default function MockupsCard({
 
   useEffect(() => {
     window.downloadAllMockups = () => {
-      if (hasContributed) {
-        executeDownloadAllCards();
-      } else if (remainingDownloads > 0) {
-        setPendingAction("downloadAllCards");
-        setShowContributionModal(true);
-      } else {
-        setPendingAction("downloadAllCards");
-        setShowContributionModal(true);
-
-        // Show toast notification
-        setShowLimitToast(true);
-        setTimeout(() => setShowLimitToast(false), 5000);
-      }
+      // No limits or paywall: always allow direct download of all mockups
+      executeDownloadAllCards();
     };
-  }, [name, hasContributed, remainingDownloads, executeDownloadAllCards]);
+  }, [name, executeDownloadAllCards]);
 
   const renderSvgOrLogo = (width, height) => {
     if (userLogo) {
@@ -418,17 +340,6 @@ export default function MockupsCard({
         ))}
       </div>
 
-      {/* Contribution modal */}
-      {showContributionModal && (
-        <ContributionModal
-          onClose={() => setShowContributionModal(false)}
-          onContribute={handleContributionSuccess}
-          onContinueWithoutPaying={handleContinueWithoutPaying}
-          itemName={
-            pendingAction === "downloadCard" ? "mockup" : "todos los mockups"
-          }
-        />
-      )}
     </>
   );
 }

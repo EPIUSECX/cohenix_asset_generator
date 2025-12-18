@@ -1,7 +1,7 @@
 
 <img src="/public/logo-view.png" />
 
-**Arosade** is a SVG logo previewer that allows you to customize and download logos with ease. Aros provides a simple, fast, and interactive experience for customizing logos. 
+**Cohenix** is a SVG logo previewer that allows you to customize and download logos with ease. Cohenix provides a simple, fast, and interactive experience for customizing logos. 
 
 <p align="center" style="font-weight: bold"> How to use  </p>
 

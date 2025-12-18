@@ -59,8 +59,9 @@ function AppContent() {
     color,
     rotation,
     thickness,
-    width: 30,
-    height: 30,
+    // Larger logical size so PNG exports are very high resolution
+    width: 100,
+    height: 100,
   });
 
   useEffect(() => {
@@ -68,8 +69,8 @@ function AppContent() {
       color,
       rotation,
       thickness,
-      width: 30,
-      height: 30,
+      width: 100,
+      height: 100,
     };
   }, [color, rotation, thickness]);
 
@@ -238,7 +239,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AppProvider initialSvg={SvgList[11]}>
+    <AppProvider initialSvg={SvgList[0]}>
       <AppContent />
     </AppProvider>
   );

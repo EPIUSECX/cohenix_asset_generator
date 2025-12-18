@@ -115,7 +115,7 @@ export default function ContributionModal({ onClose, onContribute, itemName, onC
             </button>
 
             <div className="mb-6 py-2 md:py-0 text-center">
-              <h3 className="text-xl font-semibold">Support Arosade Development</h3>
+              <h3 className="text-xl font-semibold">Support Cohenix Development</h3>
               <p className="mt-2 text-sm text-white/60 dark:text-black/60">
                 Your contribution helps maintain and improve this tool.
                 Unlock unlimited downloads of {itemName} with a small contribution.

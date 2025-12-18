@@ -38,12 +38,12 @@ const SvgGalleryModal = ({
           </button>
         </div>
         <p className="mx-5 my-2 text-xs dark:text-black">
-          All rights of the icons for{" "}
+          Powered by{" "}
           <Link
-            href="https://www.figma.com/@nathancovert"
+            href="https://www.cohenix.com"
             className="cursor-pointer hover:underline"
           >
-            @NathanCovert
+            Cohenix
           </Link>
         </p>
         <div
